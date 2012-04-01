@@ -2,6 +2,7 @@ package iAndroid.PingPong;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.Window;
 import android.view.WindowManager;
 
@@ -9,11 +10,13 @@ public class PingPong extends Activity {
 
 	private PingPongView gameView;
 	private Ball ball;
-	private Bat bottomBat;
-	private Bat topBat;
+	private Paddle bottomPaddle;
+	private Paddle topPaddle;
 	
 	private PongGame gameThread;
-
+	private PaddleMover aiThread;
+	private PaddleMover playerThread;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,21 +38,40 @@ public class PingPong extends Activity {
 				.getHeight());
 		BallView ballView = new BallView(this, ball);
 
-		topBat = new Bat(midX - 50, 10);
-		bottomBat = new Bat(midX - 50, midY * 2 - 20);
-		BatView topBatView = new BatView(this, topBat);
-		BatView bottomBatView = new BatView(this, bottomBat);
+		topPaddle = new Paddle(midX, 10, midX*2);
+		bottomPaddle = new Paddle(midX, midY * 2 - 20, midX*2);
+		PaddleView topPaddleView = new PaddleView(this, topPaddle);
+		PaddleView bottomPaddleView = new PaddleView(this, bottomPaddle);
 
 		this.gameView = new PingPongView(this);
 
-		this.gameView.setBallView(ballView);
-		this.gameView.setBottomBatView(bottomBatView);
-		this.gameView.setTopBatView(topBatView);
+		this.gameView.setViews(ballView, bottomPaddleView, topPaddleView);
 
 		this.gameView.setPadding(5, 5, 5, 5);
 		setContentView(gameView);
 
-		gameThread = new PongGame(ball, gameView);
+		gameThread = new PongGame(ball, bottomPaddle, topPaddle, gameView);
 		gameThread.start();
+		
+		aiThread = new PaddleMover(topPaddle, gameView);
+		aiThread.start();
+		
+		playerThread = new PaddleMover(bottomPaddle, gameView);
+		playerThread.start();
 	}
+	
+    //This method is automatically called when the user touches the screen
+    @Override
+    public boolean onTouchEvent(MotionEvent event)
+    {
+    	float destination;
+
+    	//get the x coordinate of users' press
+    	destination = event.getX();
+
+    	//notify the paddle mover thread regarding the new destination
+    	bottomPaddle.setPaddleDestination(destination);
+
+	    return true;
+    }
 }

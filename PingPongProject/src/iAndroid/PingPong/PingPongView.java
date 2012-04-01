@@ -9,41 +9,36 @@ import android.view.View;
 
 /**
  * @author Dagan
- *
+ * 
  */
 public class PingPongView extends View {
 
 	private BallView ballV;
-	private BatView bottomBat;
-	private BatView topBat;
-	
+	private PaddleView bottomPaddleV;
+	private PaddleView topPaddleV;
+
 	public PingPongView(Context context) {
 		super(context);
 		// TODO Auto-generated constructor stub
 	}
 
-	public void setBallView(BallView newBV) {
+	public void setViews(BallView newBV, PaddleView newBP, PaddleView newTP) {
 		this.ballV = newBV;
-	}
-	
-	public void setBottomBatView(BatView newBV) {
-		this.bottomBat = newBV;
+		this.bottomPaddleV = newBP;
+		this.topPaddleV = newTP;
 	}
 
-	public void setTopBatView(BatView newBV) {
-		this.topBat = newBV;
-	}
-	
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see android.view.View#onDraw(android.graphics.Canvas)
 	 */
 	@Override
 	protected void onDraw(Canvas canvas) {
 		this.ballV.onDraw(canvas);
-		this.topBat.onDraw(canvas);
-		this.bottomBat.onDraw(canvas);
-		
+		this.topPaddleV.onDraw(canvas);
+		this.bottomPaddleV.onDraw(canvas);
+
 	}
 
-	
 }
